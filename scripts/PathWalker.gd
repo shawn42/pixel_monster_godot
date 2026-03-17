@@ -76,6 +76,9 @@ static func build_path(locs: Array[Vector2i], start_loc: Vector2i) -> Array[Vect
 				dir = abs_dir
 				break
 
+		if next_loc == Vector2i(-9999, -9999):
+			break  # disconnected graph — no valid next cell found
+
 		if loc == start_loc and next_loc == first_next and not path.is_empty():
 			break
 
