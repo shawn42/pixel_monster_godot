@@ -36,7 +36,8 @@ func _test_parse_commands_bouncy() -> void:
 	img.set_pixel(3, 0, Color(0, 0, 0, 0))            # end of command
 	var result := LevelLoader.parse_commands(img)
 	assert(result.special_tiles.size() == 1, "one special tile")
-	var marker := Color(0.5, 0.5, 0, 1)
+	# Use normalized read-back to get the actual key stored in special_tiles
+	var marker := LevelLoader._normalize_color(img.get_pixel(2, 0))
 	assert(marker in result.special_tiles, "marker key present")
 	assert(result.special_tiles[marker].type == "bouncy", "type is bouncy")
 	print("  _test_parse_commands_bouncy: PASS")
@@ -50,7 +51,8 @@ func _test_parse_commands_black_hole() -> void:
 	img.set_pixel(3, 0, Color(1, 0, 0, 1))            # subtract = RED
 	img.set_pixel(4, 0, Color(0, 0, 0, 0))            # end
 	var result := LevelLoader.parse_commands(img)
-	var marker := Color(0.1, 0, 0, 1)
+	# Use normalized read-back to get the actual key stored in special_tiles
+	var marker := LevelLoader._normalize_color(img.get_pixel(2, 0))
 	assert(result.special_tiles[marker].type == "black_hole", "type black_hole")
 	assert(result.special_tiles[marker].subtract_color == Color.RED, "subtract color")
 	print("  _test_parse_commands_black_hole: PASS")
@@ -65,7 +67,8 @@ func _test_parse_commands_rainbow() -> void:
 	img.set_pixel(4, 0, Color(0, 1, 0, 1))            # color 2 = GREEN
 	img.set_pixel(5, 0, Color(0, 0, 0, 0))            # end
 	var result := LevelLoader.parse_commands(img)
-	var marker := Color(0.2, 0, 0, 1)
+	# Use normalized read-back to get the actual key stored in special_tiles
+	var marker := LevelLoader._normalize_color(img.get_pixel(2, 0))
 	assert(result.special_tiles[marker].type == "rainbow", "type rainbow")
 	assert(result.special_tiles[marker].colors.size() == 2, "two colors")
 	print("  _test_parse_commands_rainbow: PASS")

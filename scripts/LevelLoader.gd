@@ -45,9 +45,6 @@ static func parse_commands(img: Image) -> ParseResult:
 			_process_command(command, result)
 			command = []
 
-	if command.size() > 0:
-		_process_command(command, result)
-
 	return result
 
 static func _process_command(cmd: Array[Color], result: ParseResult) -> void:
@@ -135,15 +132,14 @@ static func _colors_approx_equal(a: Color, b: Color) -> bool:
 	# Exact match with a small float tolerance
 	return absf(a.r - b.r) < 0.01 and absf(a.g - b.g) < 0.01 and absf(a.b - b.b) < 0.01
 
-## Normalize a color read from an RGBA8 image back to the nearest 0.1-step float.
-## RGBA8 stores colors as 8-bit integers (floor rounding), which causes small
-## precision losses (e.g. Color(0.5) → 0.498, Color(0.1) → 0.098).
-## This restores the original intended values when level PNG marker colors
-## are defined using 0.1 increments (0.0, 0.1, 0.2, …, 1.0).
+## Normalize a color read from an RGBA8 image to the nearest uint8 step.
+## RGBA8 stores colors as 8-bit integers with floor-rounding; this uses
+## round-to-nearest so Color keys match both when read from PNG and when
+## constructed from float literals that round to the same uint8.
 static func _normalize_color(c: Color) -> Color:
 	return Color(
-		snappedf(c.r, 0.1),
-		snappedf(c.g, 0.1),
-		snappedf(c.b, 0.1),
-		snappedf(c.a, 0.1)
+		roundf(c.r * 255.0) / 255.0,
+		roundf(c.g * 255.0) / 255.0,
+		roundf(c.b * 255.0) / 255.0,
+		roundf(c.a * 255.0) / 255.0
 	)
