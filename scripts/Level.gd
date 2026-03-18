@@ -25,6 +25,9 @@ var average_color: Color
 ## Used for non-physics queries (exit detection, death tile AABB, fall detection).
 var tile_map: Dictionary = {}
 
+func world_to_grid(world_pos: Vector2) -> Vector2i:
+	return Vector2i(int(world_pos.x) / TILE_SIZE, int(world_pos.y) / TILE_SIZE)
+
 ## Background blob pool — managed by Level in _process
 var _blobs: Array[Node2D] = []
 const BLOB_POOL_SIZE := 8
