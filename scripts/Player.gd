@@ -47,6 +47,7 @@ func _physics_process(delta: float) -> void:
 	else:
 		_last_grounded_at = _time
 		velocity.y = 0.0
+	_check_bouncy_below()
 
 	# --- Check moving tile below ---
 	if level:
@@ -145,6 +146,19 @@ func _check_moving_tile_below(delta: float) -> void:
 			# Set Y directly
 			velocity.y = tv.y
 			break
+
+func _check_bouncy_below() -> void:
+	if not level or not is_on_floor():
+		_next_jump_boosted = false
+		return
+	for tile: Node2D in level.bouncy_tiles:
+		if not is_instance_valid(tile):
+			continue
+		var tp := tile.position
+		if absf(position.x - tp.x) <= 23 and absf((position.y + 7) - (tp.y - 16)) <= 2:
+			_next_jump_boosted = true
+			return
+	_next_jump_boosted = false
 
 func _check_tile_interactions() -> void:
 	const MIN_DIST_SQ := 80.0 * 80.0
