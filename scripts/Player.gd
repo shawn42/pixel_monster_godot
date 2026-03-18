@@ -197,6 +197,10 @@ func _check_tile_interactions() -> void:
 				)
 				GameEvents.sound_requested.emit("res://sounds/collect.wav")
 
+	# Update exit open state
+	if level and is_instance_valid(level.exit_node):
+		level.exit_node.set_open(level.has_exit_color(joy_color))
+
 	# Exit
 	if level.has_exit_color(joy_color) and level.in_exit(position, PLAYER_HALF):
 		GameEvents.level_complete.emit()
