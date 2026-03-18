@@ -1,0 +1,19 @@
+[gd_scene load_steps=4 format=3]
+[ext_resource type="Script" path="res://scripts/autoloads/GameCamera.gd" id="1_gc"]
+[ext_resource type="Script" path="res://scripts/ColorBars.gd" id="2_cb"]
+
+[node name="Game" type="Node2D"]
+script = ExtResource("1_gc")
+
+[node name="HUD" type="CanvasLayer" parent="."]
+
+[node name="TimerLabel" type="Label" parent="HUD"]
+position = Vector2(500, 40)
+
+[node name="BestTimeLabel" type="Label" parent="HUD"]
+position = Vector2(510, 80)
+theme_override_font_sizes/font_size = 16
+
+[node name="ColorBars" type="Node2D" parent="HUD"]
+position = Vector2(20, 1014)
+script = ExtResource("2_cb")
