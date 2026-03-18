@@ -19,7 +19,7 @@ func _process(delta: float) -> void:
 	position += velocity * delta * 60.0
 
 	var scalar := delta * 60.0
-	_alpha -= 20.0 * scalar / 255.0
+	_alpha -= 0.05 * scalar  # ~0.33s lifetime at 60fps
 	if _alpha <= 0.0:
 		queue_free()
 		return

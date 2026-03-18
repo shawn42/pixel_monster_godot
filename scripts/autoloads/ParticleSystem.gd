@@ -14,6 +14,8 @@ func _on_particles_requested(
 	size_range: Vector2i
 ) -> void:
 	var spawn_parent := get_tree().current_scene
+	if not spawn_parent:
+		return
 
 	# Split into R/G/B sub-emitters
 	var total := color.r + color.g + color.b

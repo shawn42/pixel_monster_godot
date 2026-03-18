@@ -11,7 +11,7 @@ func _ready() -> void:
 	_scores.load(SCORES_PATH)
 	_music_player = AudioStreamPlayer.new()
 	add_child(_music_player)
-	load_level(0)
+	call_deferred("load_level", 0)
 
 func load_level(index: int) -> void:
 	current_level_index = index
