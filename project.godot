@@ -12,6 +12,7 @@ run/main_scene="res://scenes/Game.tscn"
 GameEvents="*res://scripts/autoloads/GameEvents.gd"
 ColorUtils="*res://scripts/autoloads/ColorUtils.gd"
 GameManager="*res://scripts/autoloads/GameManager.gd"
+ParticleSystem="*res://scripts/autoloads/ParticleSystem.gd"
 
 [display]
 
