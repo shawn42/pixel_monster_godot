@@ -7,7 +7,7 @@ const JUMP_FORCE     := -15.0
 const SUPER_JUMP     := -25.0
 const JUMP_FORGIVE   := 0.100  # 100ms
 const RUN_FORGIVE    := 0.020  # 20ms
-const LATERAL_ACCEL  := 1.0 / 17.0  # per-second, scaled by delta
+const LATERAL_ACCEL  := 1000.0 / 17.0  # ms-equivalent: Ruby used dt_ms/17.0
 
 var joy_color: Color = Color.BLACK
 var level: Level = null  # set by LevelLoader after spawning
