@@ -291,11 +291,11 @@ func _draw() -> void:
 		Vector2(x1-1, y1-1), Vector2(x2+1, y2-1),
 		Vector2(x3+1, y3+1), Vector2(x4-1, y4+1)
 	])
-	draw_colored_polygon(border_pts, PackedColorArray([Color.WHITE, Color.WHITE, Color.WHITE, Color.WHITE]))
+	draw_colored_polygon(border_pts, Color.WHITE)
 
 	# Colored quad
 	var pts := PackedVector2Array([Vector2(x1,y1), Vector2(x2,y2), Vector2(x3,y3), Vector2(x4,y4)])
-	draw_colored_polygon(pts, PackedColorArray([joy_color, joy_color, joy_color, joy_color]))
+	draw_colored_polygon(pts, joy_color)
 
 # --- Death ---
 
