@@ -45,27 +45,18 @@ func _physics_process(delta: float) -> void:
 		_velocity = Vector2.ZERO
 		set_meta("velocity", _velocity)
 
-	# Move tile one step and check for player crush
-	var vel_x := _velocity.x
-	var vel_y := _velocity.y
-	var x_steps := int(absf(vel_x))
-	var y_steps := int(absf(vel_y))
-	var x_sign  := sign(vel_x) as int
-	var y_sign  := sign(vel_y) as int
-
+	# Move tile and check for player crush
 	var player: Node2D = _get_player()
 
-	for _i in x_steps:
-		position.x += x_sign
-		if player and _is_player_crushed(player):
-			player._die()
-			return
+	position.x += _velocity.x
+	if player and _is_player_crushed(player):
+		player._die()
+		return
 
-	for _i in y_steps:
-		position.y += y_sign
-		if player and _is_player_crushed(player):
-			player._die()
-			return
+	position.y += _velocity.y
+	if player and _is_player_crushed(player):
+		player._die()
+		return
 
 	queue_redraw()
 
