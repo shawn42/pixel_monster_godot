@@ -136,7 +136,7 @@ func _physics_process(delta: float) -> void:
 
 	# --- Fall off map ---
 	if position.y > 1100:
-		_die()
+		_die(Vector2(position.x, float(level.map_height * 32)))
 
 	# --- Tile interactions ---
 	if level:
@@ -261,7 +261,8 @@ func _collect_color_tile(tile: Node2D) -> void:
 			joy_color = ColorUtils.blend(joy_color, tile_color)
 
 	level.color_sources.erase(tile)
-	GameEvents.particles_requested.emit(tile_color, self, 5, Vector2(-3, 3), Vector2i(2, 6), Vector2.ZERO, Vector2.ZERO)
+	var tile_offset := tile.global_position - global_position
+	GameEvents.particles_requested.emit(tile_color, self, 8, Vector2(-1.5, 1.5), Vector2i(3, 5), Vector2.ZERO, tile_offset)
 	GameEvents.sound_requested.emit("res://sounds/collect.wav")
 	if tile.get("path_nodes") != null:
 		# Moving tile — clear color but keep moving
@@ -403,13 +404,25 @@ func _draw() -> void:
 
 # --- Death ---
 
-func _die() -> void:
-	# Emit death particles (intensity 40, speed ±7, size 2–6) then signal
+var _dead := false
+const DEATH_DELAY := 1.5
+
+func _die(particle_pos_override: Variant = null) -> void:
+	if _dead:
+		return
+	_dead = true
+	# Emit death particles then hide
+	var spawn_offset := Vector2.ZERO
+	if particle_pos_override is Vector2:
+		spawn_offset = particle_pos_override - global_position
 	GameEvents.particles_requested.emit(
-		joy_color, null, 40, Vector2(-7.0, 7.0), Vector2i(2, 6), Vector2.ZERO, Vector2.ZERO
+		joy_color, self, 40, Vector2(-7.0, 7.0), Vector2i(2, 6), Vector2.ZERO, spawn_offset
 	)
 	GameEvents.sound_requested.emit("res://sounds/death.wav")
-	GameEvents.player_died.emit()
+	visible = false
+	set_physics_process(false)
+	set_process(false)
+	get_tree().create_timer(DEATH_DELAY).timeout.connect(func(): GameEvents.player_died.emit())
 
 # --- Utility ---
 

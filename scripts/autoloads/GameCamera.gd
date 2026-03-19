@@ -7,6 +7,7 @@ const MOBILE_RIGHT_GUTTER := 550.0  # right gutter for jump button + color inspe
 var _level: Node2D = null
 var _is_mobile := false
 var _timer_ms: float = 0.0
+var _timer_started := false
 var _hud_level_label: Label = null
 var _hud_timer_label: Label = null
 var _hud_best_label:  Label = null
@@ -53,6 +54,7 @@ func load_level(level: Node2D) -> void:
 	_level = level
 	add_child(level)
 	_timer_ms = 0.0
+	_timer_started = false
 	_update_camera()
 	# Update level name label
 	if _hud_level_label:
@@ -84,7 +86,13 @@ func _update_camera() -> void:
 func _process(delta: float) -> void:
 	if not _level:
 		return
-	_timer_ms += delta * 1000.0
+	if not _timer_started:
+		for action in ["move_left", "move_right", "jump", "reset"]:
+			if Input.is_action_just_pressed(action):
+				_timer_started = true
+				break
+	if _timer_started:
+		_timer_ms += delta * 1000.0
 	_update_hud()
 	# Update color bar data
 	if _color_bars and is_instance_valid(_level.player):

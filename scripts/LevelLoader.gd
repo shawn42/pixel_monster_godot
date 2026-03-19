@@ -199,11 +199,12 @@ static func load_level(png_path: String) -> Node2D:
 			if not made_movable:
 				match tile_type:
 					"player_spawn":
-						var p: Node2D = SCENE_PLAYER.instantiate()
-						p.position = Vector2(world_x, world_y)
-						level.add_child(p)
-						level.player = p
-						p.set("level", level)
+						if level.player == null:
+							var p: Node2D = SCENE_PLAYER.instantiate()
+							p.position = Vector2(world_x, world_y)
+							level.add_child(p)
+							level.player = p
+							p.set("level", level)
 
 					"exit":
 						var ex: Node2D = SCENE_EXIT.instantiate()
