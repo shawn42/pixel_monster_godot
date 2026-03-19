@@ -3,7 +3,7 @@ extends CharacterBody2D
 const TILE_SIZE    := 32
 const TILE_HALF    := TILE_SIZE / 2
 const MOVE_SPEED   := 60.0
-const PATH_EPSILON := 4.0
+const PATH_EPSILON := 1.0
 
 var path_nodes: Array = []  # Array of Vector2i — untyped to allow set() from LevelLoader
 var tile_color: Color = Color.GRAY
@@ -18,6 +18,14 @@ var _debug_frames: int = 0
 func _ready() -> void:
 	set_meta("source_type", source_type)
 	set_meta("tile_color",  tile_color)
+	# Validate path: all consecutive nodes should be adjacent (manhattan dist = 1)
+	for i in path_nodes.size():
+		var next_i := (i + 1) % path_nodes.size()
+		var a: Vector2i = path_nodes[i]
+		var b: Vector2i = path_nodes[next_i]
+		var mdist := absi(b.x - a.x) + absi(b.y - a.y)
+		if mdist != 1:
+			print("[PATH] non-adjacent nodes at idx %d→%d: %s→%s (dist=%d) path=%s" % [i, next_i, a, b, mdist, path_nodes])
 	# Layer 3 (bitmask 4) — player is layer 2, walls are layer 1.
 	# Moving tiles check layer 1 (walls only), so player can't block them.
 	# Player mask includes layer 3, so player can still stand on moving tiles.
@@ -46,6 +54,8 @@ func _physics_process(delta: float) -> void:
 	var dist      := to_target.length()
 
 	if dist < PATH_EPSILON:
+		# Snap to grid center to prevent drift
+		position = target_world
 		_path_index = (_path_index + 1) % path_nodes.size()
 		target_grid  = path_nodes[_path_index] as Vector2i
 		target_world = Vector2(target_grid.x * TILE_SIZE + TILE_HALF,
@@ -53,9 +63,14 @@ func _physics_process(delta: float) -> void:
 		to_target    = target_world - position
 		dist         = to_target.length()
 
+	# Move along one axis only (like Ruby) to prevent diagonal movement
 	if dist > 0:
-		var dir      := to_target / dist
-		_velocity    = dir * MOVE_SPEED
+		var dir := Vector2.ZERO
+		if absf(to_target.x) > absf(to_target.y):
+			dir.x = signf(to_target.x)
+		else:
+			dir.y = signf(to_target.y)
+		_velocity = dir * MOVE_SPEED
 		set_meta("velocity", _velocity)
 	else:
 		_velocity = Vector2.ZERO

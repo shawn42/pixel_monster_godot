@@ -87,11 +87,4 @@ static func build_path(locs: Array[Vector2i], start_loc: Vector2i) -> Array[Vect
 			first_next = next_loc
 		loc = next_loc
 
-	# Deduplicate while preserving order (handles non-closed shapes like lines)
-	var seen: Dictionary = {}
-	var unique_path: Array[Vector2i] = []
-	for p in path:
-		if not seen.has(p):
-			seen[p] = true
-			unique_path.append(p)
-	return unique_path
+	return path
