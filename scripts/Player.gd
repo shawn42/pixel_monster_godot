@@ -118,6 +118,10 @@ func _physics_process(delta: float) -> void:
 	var old_vy := velocity.y
 	move_and_slide()
 
+	# --- Crush detection: manual AABB overlap (move_and_slide doesn't detect
+	#     moving tiles because they use direct position updates) ---
+	_check_crush()
+
 	# Y-hit (landing or ceiling)
 	if is_on_floor() and old_vy > 0:
 		_trigger_squish_y(maxf(old_vy, 360.0) / MAX_VEL * SQUISH_Y_MAX, 1)
@@ -278,6 +282,53 @@ func _collect_color_tile(tile: Node2D) -> void:
 		visual.position = Vector2(-TILE_HALF, -TILE_HALF)
 		gray.add_child(visual)
 		level.add_child(gray)
+
+# --- Crush detection ---
+## After move_and_slide(), check if the player is being squeezed between
+## a moving tile and a wall (or another moving tile).
+func _check_crush() -> void:
+	if not level:
+		return
+	var ph := float(PLAYER_HALF)
+	var th := float(TILE_HALF)
+	for tile: Node2D in level.moving_tiles:
+		if not is_instance_valid(tile):
+			continue
+		var dx := position.x - tile.position.x
+		var dy := position.y - tile.position.y
+		var overlap_x := (ph + th) - absf(dx)
+		var overlap_y := (ph + th) - absf(dy)
+		if overlap_x <= 0 or overlap_y <= 0:
+			continue
+		# Player overlaps this moving tile — find push direction (smallest overlap)
+		var push := Vector2.ZERO
+		if overlap_x < overlap_y:
+			push.x = overlap_x * signf(dx)
+		else:
+			push.y = overlap_y * signf(dy)
+		var new_pos := position + push
+		# Check if pushed position is blocked by a wall
+		var blocked := false
+		var w := ph - 2.0
+		for corner in [Vector2(-w, -w), Vector2(w, -w), Vector2(-w, w), Vector2(w, w)]:
+			if level.is_blocked(level.world_to_grid(new_pos + corner)):
+				blocked = true
+				break
+		# Check if pushed into another moving tile
+		if not blocked:
+			for other: Node2D in level.moving_tiles:
+				if other == tile or not is_instance_valid(other):
+					continue
+				var ox := (ph + th) - absf(new_pos.x - other.position.x)
+				var oy := (ph + th) - absf(new_pos.y - other.position.y)
+				if ox > 0 and oy > 0:
+					blocked = true
+					break
+		if blocked:
+			_die()
+			return
+		else:
+			position = new_pos
 
 # --- Squish helpers ---
 

@@ -221,6 +221,7 @@ static func load_level(png_path: String) -> Node2D:
 							tile.set("tile_color", px)
 						level.add_child(tile)
 						level.color_sources.append(tile)
+						level.tile_map[grid_pos] = true
 						colors.append(px)
 
 					"ghost":
@@ -231,6 +232,7 @@ static func load_level(png_path: String) -> Node2D:
 							tile.set("tile_color", def.display_color if def else px)
 						level.add_child(tile)
 						level.color_sources.append(tile)
+						level.tile_map[grid_pos] = true
 
 					"super_src":
 						var def: LevelLoader.TileDef = parse.special_tiles.get(norm_px)
@@ -240,6 +242,7 @@ static func load_level(png_path: String) -> Node2D:
 							tile.set("tile_color", def.display_color if def else px)
 						level.add_child(tile)
 						level.color_sources.append(tile)
+						level.tile_map[grid_pos] = true
 
 					"bouncy":
 						var tile: Node2D = SCENE_BOUNCY.instantiate()
@@ -253,6 +256,7 @@ static func load_level(png_path: String) -> Node2D:
 						tile.position = Vector2(world_x, world_y)
 						level.add_child(tile)
 						level.death_tiles.append(tile)
+						level.tile_map[grid_pos] = true
 
 					"black_hole":
 						var def: LevelLoader.TileDef = parse.special_tiles.get(norm_px)
@@ -262,6 +266,7 @@ static func load_level(png_path: String) -> Node2D:
 							tile.set("subtract_color", def.subtract_color if def else Color.WHITE)
 						level.add_child(tile)
 						level.black_holes.append(tile)
+						level.tile_map[grid_pos] = true
 
 					"rainbow":
 						var def: LevelLoader.TileDef = parse.special_tiles.get(norm_px)
@@ -271,11 +276,13 @@ static func load_level(png_path: String) -> Node2D:
 							tile.set("colors", def.colors if def else [Color.WHITE])
 						level.add_child(tile)
 						level.color_sources.append(tile)
+						level.tile_map[grid_pos] = true
 
 					"empty":
 						var tile: Node2D = SCENE_EMPTY.instantiate()
 						tile.position = Vector2(world_x, world_y)
 						level.add_child(tile)
+						level.tile_map[grid_pos] = true
 
 	# Compute average color (from color source pixels only)
 	if colors.size() > 0:

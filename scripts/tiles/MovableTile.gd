@@ -64,29 +64,10 @@ func _physics_process(delta: float) -> void:
 	# Move tile directly along path (no physics — paths are predefined)
 	position += _velocity * delta
 
-	var player: Node2D = _get_player()
-	if player and _is_player_crushed(player):
-		player._die()
-		return
+	# Crush detection handled by Player._check_crush() after move_and_slide()
 
 	if source_type == "death" or DEBUG_PATH:
 		queue_redraw()
-
-func _is_player_crushed(player: Node2D) -> bool:
-	if not _boxes_touch(position, Vector2(16,16), player.position, Vector2(14,14), 0):
-		return false
-	var level := _get_level()
-	if not level:
-		return false
-	var pw   := player.position
-	var pw_x := pw.x
-	var pw_y := pw.y
-	var w    := 7.0
-	var h    := 7.0
-	return level.is_blocked(level.world_to_grid(Vector2(pw_x - w, pw_y - h))) or \
-		   level.is_blocked(level.world_to_grid(Vector2(pw_x + w, pw_y - h))) or \
-		   level.is_blocked(level.world_to_grid(Vector2(pw_x - w, pw_y + h))) or \
-		   level.is_blocked(level.world_to_grid(Vector2(pw_x + w, pw_y + h)))
 
 func _draw() -> void:
 	if DEBUG_PATH and not path_nodes.is_empty():
@@ -115,16 +96,3 @@ func _draw() -> void:
 			draw_rect(Rect2(rx, ry, rw, rh), rc)
 	else:
 		draw_rect(Rect2(-16, -16, 32, 32), tile_color)
-
-func _get_player() -> Node2D:
-	var level := _get_level()
-	return level.player if level else null
-
-func _get_level() -> Node2D:
-	var p := get_parent()
-	if p.get_script() and p.get_script().get_global_name() == "Level":
-		return p
-	return null
-
-static func _boxes_touch(a: Vector2, ah: Vector2, b: Vector2, bh: Vector2, buf: float) -> bool:
-	return absf(a.x - b.x) <= (ah.x + bh.x + buf) and absf(a.y - b.y) <= (ah.y + bh.y + buf)
