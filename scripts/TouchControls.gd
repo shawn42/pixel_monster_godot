@@ -7,6 +7,8 @@ var _jump_touch_id := -1
 const BUTTON_SIZE := 240.0
 const BUTTON_MARGIN := 15.0
 const BUTTON_Y_OFFSET := 280.0  # distance from bottom
+const TOP_BTN_SIZE := 120.0
+const TOP_BTN_Y := 30.0  # distance from top
 
 func _ready() -> void:
 	# Only show on touchscreen devices
@@ -32,7 +34,11 @@ func _handle_touch(event: InputEventScreenTouch) -> void:
 	var viewport_size := get_viewport().get_visible_rect().size
 
 	if event.pressed:
-		if _is_in_left_button(pos, viewport_size):
+		if _is_in_restart_button(pos):
+			GameManager.reload_level()
+		elif _is_in_skip_button(pos):
+			GameManager.skip_level()
+		elif _is_in_left_button(pos, viewport_size):
 			_left_pressed = true
 			Input.action_press("move_left")
 		elif _is_in_right_button(pos, viewport_size):
@@ -80,6 +86,16 @@ func _handle_drag(event: InputEventScreenDrag) -> void:
 			if _right_pressed:
 				_right_pressed = false
 				Input.action_release("move_right")
+
+func _is_in_restart_button(pos: Vector2) -> bool:
+	var bx := BUTTON_MARGIN
+	var by := TOP_BTN_Y
+	return pos.x >= bx and pos.x <= bx + TOP_BTN_SIZE and pos.y >= by and pos.y <= by + TOP_BTN_SIZE
+
+func _is_in_skip_button(pos: Vector2) -> bool:
+	var bx := BUTTON_MARGIN + TOP_BTN_SIZE + BUTTON_MARGIN
+	var by := TOP_BTN_Y
+	return pos.x >= bx and pos.x <= bx + TOP_BTN_SIZE and pos.y >= by and pos.y <= by + TOP_BTN_SIZE
 
 func _is_in_left_button(pos: Vector2, viewport_size: Vector2) -> bool:
 	var bx := BUTTON_MARGIN

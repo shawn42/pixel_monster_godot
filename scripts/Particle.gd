@@ -10,7 +10,7 @@ var _alpha: float = 1.0
 func _process(delta: float) -> void:
 	# Attract toward target or drift upward
 	if is_instance_valid(target):
-		var to_target := target.position - position
+		var to_target := target.global_position - position
 		var dist      := to_target.length()
 		if dist > 1:
 			velocity += to_target.normalized() * delta * pull_strength

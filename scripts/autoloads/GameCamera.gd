@@ -29,6 +29,18 @@ func _ready() -> void:
 		var right_gutter_center := MOBILE_LEFT_GUTTER + WINDOW_SIZE + MOBILE_RIGHT_GUTTER / 2.0
 		_color_bars.position = Vector2(right_gutter_center, WINDOW_SIZE / 2.0 + 60.0)
 		_color_bars.scale = Vector2(3.0, 3.0)
+		# Center timer labels over the game area, not the full viewport
+		var game_center_x := MOBILE_LEFT_GUTTER + WINDOW_SIZE / 2.0
+		if _hud_timer_label:
+			_hud_timer_label.anchor_left = 0.0
+			_hud_timer_label.anchor_right = 0.0
+			_hud_timer_label.offset_left = game_center_x - 100.0
+			_hud_timer_label.offset_right = game_center_x + 100.0
+		if _hud_best_label:
+			_hud_best_label.anchor_left = 0.0
+			_hud_best_label.anchor_right = 0.0
+			_hud_best_label.offset_left = game_center_x - 100.0
+			_hud_best_label.offset_right = game_center_x + 100.0
 
 func load_level(level: Node2D) -> void:
 	if _level:

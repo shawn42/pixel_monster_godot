@@ -5,6 +5,9 @@ const BUTTON_MARGIN := 15.0
 const BUTTON_Y_OFFSET := 280.0
 const ARROW_COLOR := Color(1, 1, 1, 0.3)
 const PRESSED_COLOR := Color(1, 1, 1, 0.6)
+const TOP_BTN_SIZE := 120.0
+const TOP_BTN_Y := 30.0
+const LABEL_COLOR := Color(1, 1, 1, 0.3)
 
 var _parent: Node = null
 
@@ -29,6 +32,18 @@ func _draw() -> void:
 	# Black gutter backgrounds
 	draw_rect(Rect2(0, 0, LEFT_GUTTER, vs.y), Color.BLACK)
 	draw_rect(Rect2(vs.x - RIGHT_GUTTER, 0, RIGHT_GUTTER, vs.y), Color.BLACK)
+
+	# Restart button (top-left)
+	var rst_x := BUTTON_MARGIN
+	var rst_y := TOP_BTN_Y
+	draw_rect(Rect2(rst_x, rst_y, TOP_BTN_SIZE, TOP_BTN_SIZE), Color(1, 1, 1, 0.1))
+	_draw_restart_icon(Vector2(rst_x + TOP_BTN_SIZE / 2, rst_y + TOP_BTN_SIZE / 2), LABEL_COLOR)
+
+	# Skip button (top, next to restart)
+	var skip_x := BUTTON_MARGIN + TOP_BTN_SIZE + BUTTON_MARGIN
+	var skip_y := TOP_BTN_Y
+	draw_rect(Rect2(skip_x, skip_y, TOP_BTN_SIZE, TOP_BTN_SIZE), Color(1, 1, 1, 0.1))
+	_draw_skip_icon(Vector2(skip_x + TOP_BTN_SIZE / 2, skip_y + TOP_BTN_SIZE / 2), LABEL_COLOR)
 
 	# Left button background
 	var lx := BUTTON_MARGIN
@@ -56,3 +71,40 @@ func _draw_arrow(center: Vector2, direction: int, color: Color) -> void:
 	var top := center + Vector2(-direction * half, -half)
 	var bot := center + Vector2(-direction * half, half)
 	draw_colored_polygon(PackedVector2Array([tip, top, bot]), color)
+
+func _draw_restart_icon(center: Vector2, color: Color) -> void:
+	# Circular arrow: arc + arrowhead
+	var radius := 25.0
+	var points := PackedVector2Array()
+	for i in range(21):
+		var angle := -PI * 0.8 + (i / 20.0) * PI * 1.4
+		points.append(center + Vector2(cos(angle), sin(angle)) * radius)
+	draw_polyline(points, color, 3.0)
+	# Arrowhead at the end of the arc
+	var end_angle := -PI * 0.8 + PI * 1.4
+	var tip := center + Vector2(cos(end_angle), sin(end_angle)) * radius
+	var perp := Vector2(-sin(end_angle), cos(end_angle))
+	var back := Vector2(cos(end_angle), sin(end_angle))
+	draw_colored_polygon(PackedVector2Array([
+		tip + perp * 10.0,
+		tip - back * 14.0,
+		tip - perp * 4.0,
+	]), color)
+
+func _draw_skip_icon(center: Vector2, color: Color) -> void:
+	# Double right-pointing triangle + bar (skip icon)
+	var s := 22.0
+	# First triangle
+	draw_colored_polygon(PackedVector2Array([
+		center + Vector2(-s, -s),
+		center + Vector2(0, 0),
+		center + Vector2(-s, s),
+	]), color)
+	# Second triangle
+	draw_colored_polygon(PackedVector2Array([
+		center + Vector2(0, -s),
+		center + Vector2(s, 0),
+		center + Vector2(0, s),
+	]), color)
+	# End bar
+	draw_rect(Rect2(center.x + s + 2, center.y - s, 5, s * 2), color)

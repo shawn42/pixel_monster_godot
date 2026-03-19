@@ -31,7 +31,7 @@ func _on_particles_requested(
 		Color.BLUE:  roundi(intensity * color.b / total),
 	}
 
-	var spawn_pos: Vector2 = (target.position if is_instance_valid(target) else Vector2.ZERO) + spawn_offset
+	var spawn_pos: Vector2 = (target.global_position if is_instance_valid(target) else Vector2.ZERO) + spawn_offset
 
 	for sub_color: Color in counts:
 		var count: int = counts[sub_color]

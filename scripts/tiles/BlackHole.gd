@@ -22,7 +22,7 @@ func _spawn_spiral_particle() -> void:
 		return
 	var angle := randf() * TAU
 	var p: Node2D = SCENE_PARTICLE.instantiate()
-	p.position = position + Vector2(cos(angle), sin(angle)) * SPAWN_RADIUS
+	p.position = global_position + Vector2(cos(angle), sin(angle)) * SPAWN_RADIUS
 	# Tangential velocity (clockwise)
 	p.velocity = Vector2(sin(angle), -cos(angle)) * randf_range(TANGENT_SPEED * 0.5, TANGENT_SPEED * 1.5)
 	p.particle_color = subtract_color
