@@ -1,0 +1,3 @@
+- add mobile controls
+- basic android export working
+- last level starts with TWO players on the map
