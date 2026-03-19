@@ -16,6 +16,7 @@ compatibility/default_parent_skeleton_in_mesh_instance_3d=true
 
 config/name="PixelMonster"
 run/main_scene="res://scenes/Game.tscn"
+config/icon="res://icon.png"
 config/features=PackedStringArray("4.6", "GL Compatibility")
 
 [autoload]

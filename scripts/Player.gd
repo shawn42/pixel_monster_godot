@@ -34,7 +34,8 @@ var _squish_x_amount := 0.0
 
 const SQUISH_DURATION := 0.150
 const SQUISH_PEAK     := SQUISH_DURATION / 4.0
-const SQUISH_MAX      := 8.0
+const SQUISH_Y_MAX    := 11.0
+const SQUISH_X_MAX    := 18.0
 
 var _time := 0.0
 var _on_moving_tile := false
@@ -72,8 +73,12 @@ func _physics_process(delta: float) -> void:
 	var old_vx := velocity.x
 	if Input.is_action_pressed("move_left"):
 		velocity.x -= accel
+		if old_vx >= 0:
+			_trigger_squish_x(SQUISH_X_MAX * 0.6, -1)
 	elif Input.is_action_pressed("move_right"):
 		velocity.x += accel
+		if old_vx <= 0:
+			_trigger_squish_x(SQUISH_X_MAX * 0.6, 1)
 
 	velocity.x = clampf(velocity.x, -MAX_VEL, MAX_VEL)
 
@@ -95,7 +100,7 @@ func _physics_process(delta: float) -> void:
 		_next_jump_boosted = false
 		_last_grounded_at = -1.0
 		velocity.y = force
-		_trigger_squish_y(-velocity.y / MAX_VEL * SQUISH_MAX, 1)
+		_trigger_squish_y(-velocity.y / MAX_VEL * SQUISH_Y_MAX, 1)
 		GameEvents.sound_requested.emit("res://sounds/" + ["jump1.wav","jump2.wav"].pick_random())
 
 	elif Input.is_action_just_released("jump"):
@@ -115,14 +120,14 @@ func _physics_process(delta: float) -> void:
 
 	# Y-hit (landing or ceiling)
 	if is_on_floor() and old_vy > 0:
-		_trigger_squish_y(maxf(old_vy, 360.0) / MAX_VEL * SQUISH_MAX, 1)
+		_trigger_squish_y(maxf(old_vy, 360.0) / MAX_VEL * SQUISH_Y_MAX, 1)
 		GameEvents.sound_requested.emit("res://sounds/collect.wav")
 	elif velocity.y == 0 and old_vy < 0:
-		_trigger_squish_y(maxf(-old_vy, 360.0) / MAX_VEL * SQUISH_MAX, -1)
+		_trigger_squish_y(maxf(-old_vy, 360.0) / MAX_VEL * SQUISH_Y_MAX, -1)
 
 	# X-hit (wall)
 	if velocity.x == 0 and absf(old_vx) > 0 and not Input.is_action_pressed("move_left") and not Input.is_action_pressed("move_right"):
-		_trigger_squish_x(maxf(absf(old_vx), 360.0) / MAX_VEL * SQUISH_MAX, sign(old_vx) as int)
+		_trigger_squish_x(maxf(absf(old_vx), 360.0) / MAX_VEL * SQUISH_X_MAX, sign(old_vx) as int)
 
 	# --- Fall off map ---
 	if position.y > 1100:

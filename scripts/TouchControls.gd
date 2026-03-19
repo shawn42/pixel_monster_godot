@@ -34,10 +34,14 @@ func _handle_touch(event: InputEventScreenTouch) -> void:
 	var viewport_size := get_viewport().get_visible_rect().size
 
 	if event.pressed:
-		if _is_in_restart_button(pos):
+		if event.double_tap and _try_teleport(pos):
+			return
+		elif _is_in_restart_button(pos):
 			GameManager.reload_level()
 		elif _is_in_skip_button(pos):
 			GameManager.skip_level()
+		elif _is_in_exit_button(pos):
+			get_tree().quit()
 		elif _is_in_left_button(pos, viewport_size):
 			_left_pressed = true
 			Input.action_press("move_left")
@@ -97,6 +101,11 @@ func _is_in_skip_button(pos: Vector2) -> bool:
 	var by := TOP_BTN_Y
 	return pos.x >= bx and pos.x <= bx + TOP_BTN_SIZE and pos.y >= by and pos.y <= by + TOP_BTN_SIZE
 
+func _is_in_exit_button(pos: Vector2) -> bool:
+	var bx := BUTTON_MARGIN + (TOP_BTN_SIZE + BUTTON_MARGIN) * 2
+	var by := TOP_BTN_Y
+	return pos.x >= bx and pos.x <= bx + TOP_BTN_SIZE and pos.y >= by and pos.y <= by + TOP_BTN_SIZE
+
 func _is_in_left_button(pos: Vector2, viewport_size: Vector2) -> bool:
 	var bx := BUTTON_MARGIN
 	var by := viewport_size.y - BUTTON_Y_OFFSET
@@ -106,3 +115,27 @@ func _is_in_right_button(pos: Vector2, viewport_size: Vector2) -> bool:
 	var bx := BUTTON_MARGIN + BUTTON_SIZE + BUTTON_MARGIN
 	var by := viewport_size.y - BUTTON_Y_OFFSET
 	return pos.x >= bx and pos.x <= bx + BUTTON_SIZE and pos.y >= by and pos.y <= by + BUTTON_SIZE
+
+const LEFT_GUTTER  := 550.0
+const RIGHT_GUTTER := 400.0
+
+func _try_teleport(screen_pos: Vector2) -> bool:
+	# Only teleport if tap is in the game area (between gutters)
+	var vs := get_viewport().get_visible_rect().size
+	if screen_pos.x < LEFT_GUTTER or screen_pos.x > vs.x - RIGHT_GUTTER:
+		return false
+	var game := get_node_or_null("/root/Game")
+	if not game:
+		return false
+	var level: Node2D = game._level
+	if not level or not is_instance_valid(level.player):
+		return false
+	# Convert screen position to level-local coordinates
+	var local_pos := level.get_global_transform().affine_inverse() * screen_pos
+	var hw := 12.0  # half player width
+	for corner in [Vector2(-hw, -hw), Vector2(hw, -hw), Vector2(-hw, hw), Vector2(hw, hw)]:
+		if level.is_blocked(level.world_to_grid(local_pos + corner)):
+			return false
+	level.player.position = local_pos
+	level.player.velocity = Vector2.ZERO
+	return true

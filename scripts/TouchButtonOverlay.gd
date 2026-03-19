@@ -45,6 +45,12 @@ func _draw() -> void:
 	draw_rect(Rect2(skip_x, skip_y, TOP_BTN_SIZE, TOP_BTN_SIZE), Color(1, 1, 1, 0.1))
 	_draw_skip_icon(Vector2(skip_x + TOP_BTN_SIZE / 2, skip_y + TOP_BTN_SIZE / 2), LABEL_COLOR)
 
+	# Exit button (top, next to skip)
+	var exit_x := BUTTON_MARGIN + (TOP_BTN_SIZE + BUTTON_MARGIN) * 2
+	var exit_y := TOP_BTN_Y
+	draw_rect(Rect2(exit_x, exit_y, TOP_BTN_SIZE, TOP_BTN_SIZE), Color(1, 1, 1, 0.1))
+	_draw_exit_icon(Vector2(exit_x + TOP_BTN_SIZE / 2, exit_y + TOP_BTN_SIZE / 2), LABEL_COLOR)
+
 	# Left button background
 	var lx := BUTTON_MARGIN
 	var ly := vs.y - BUTTON_Y_OFFSET
@@ -108,3 +114,10 @@ func _draw_skip_icon(center: Vector2, color: Color) -> void:
 	]), color)
 	# End bar
 	draw_rect(Rect2(center.x + s + 2, center.y - s, 5, s * 2), color)
+
+func _draw_exit_icon(center: Vector2, color: Color) -> void:
+	# X shape
+	var s := 20.0
+	var w := 4.0
+	draw_line(center + Vector2(-s, -s), center + Vector2(s, s), color, w)
+	draw_line(center + Vector2(s, -s), center + Vector2(-s, s), color, w)
