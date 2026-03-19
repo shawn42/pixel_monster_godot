@@ -9,14 +9,25 @@ script = ExtResource("1_gc")
 
 [node name="HUD" type="CanvasLayer" parent="." unique_id=1885799725]
 
+[node name="LevelNameLabel" type="Label" parent="HUD"]
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -150.0
+offset_top = 18.0
+offset_right = 150.0
+offset_bottom = 42.0
+theme_override_font_sizes/font_size = 20
+horizontal_alignment = 1
+
 [node name="TimerLabel" type="Label" parent="HUD" unique_id=1035720817]
 anchors_preset = 5
 anchor_left = 0.5
 anchor_right = 0.5
 offset_left = -100.0
-offset_top = 20.0
+offset_top = 42.0
 offset_right = 100.0
-offset_bottom = 60.0
+offset_bottom = 82.0
 theme_override_font_sizes/font_size = 64
 horizontal_alignment = 1
 
@@ -25,9 +36,9 @@ anchors_preset = 5
 anchor_left = 0.5
 anchor_right = 0.5
 offset_left = -150.0
-offset_top = 90.0
+offset_top = 112.0
 offset_right = 150.0
-offset_bottom = 140.0
+offset_bottom = 152.0
 theme_override_font_sizes/font_size = 40
 horizontal_alignment = 1
 

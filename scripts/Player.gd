@@ -268,6 +268,9 @@ func _collect_color_tile(tile: Node2D) -> void:
 		tile.set("tile_color", Color(0.5, 0.5, 0.5, 1.0))
 		tile.set_meta("tile_color", Color(0.5, 0.5, 0.5, 1.0))
 		tile.queue_redraw()
+	elif source_type == "ghost":
+		# Ghost tiles vanish completely — no gray platform
+		tile.queue_free()
 	else:
 		tile.queue_free()
 		# Replace with solid gray tile (StaticBody2D so player can still stand on it)

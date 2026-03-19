@@ -7,6 +7,7 @@ const MOBILE_RIGHT_GUTTER := 550.0  # right gutter for jump button + color inspe
 var _level: Node2D = null
 var _is_mobile := false
 var _timer_ms: float = 0.0
+var _hud_level_label: Label = null
 var _hud_timer_label: Label = null
 var _hud_best_label:  Label = null
 var _color_bars:      Node2D = null
@@ -18,6 +19,7 @@ func _ready() -> void:
 	GameEvents.sound_requested.connect(_on_sound_requested)
 	_is_mobile = DisplayServer.is_touchscreen_available()
 
+	_hud_level_label = $HUD/LevelNameLabel
 	_hud_timer_label = $HUD/TimerLabel
 	_hud_best_label  = $HUD/BestTimeLabel
 	_color_bars      = $HUD/ColorBars
@@ -38,16 +40,12 @@ func _ready() -> void:
 		var game_center_x := MOBILE_LEFT_GUTTER + WINDOW_SIZE / 2.0
 		if _timer_bg:
 			_timer_bg.bg_center_x = game_center_x
-		if _hud_timer_label:
-			_hud_timer_label.anchor_left = 0.0
-			_hud_timer_label.anchor_right = 0.0
-			_hud_timer_label.offset_left = game_center_x - 100.0
-			_hud_timer_label.offset_right = game_center_x + 100.0
-		if _hud_best_label:
-			_hud_best_label.anchor_left = 0.0
-			_hud_best_label.anchor_right = 0.0
-			_hud_best_label.offset_left = game_center_x - 100.0
-			_hud_best_label.offset_right = game_center_x + 100.0
+		for lbl in [_hud_level_label, _hud_timer_label, _hud_best_label]:
+			if lbl:
+				lbl.anchor_left = 0.0
+				lbl.anchor_right = 0.0
+				lbl.offset_left = game_center_x - 150.0
+				lbl.offset_right = game_center_x + 150.0
 
 func load_level(level: Node2D) -> void:
 	if _level:
@@ -56,6 +54,9 @@ func load_level(level: Node2D) -> void:
 	add_child(level)
 	_timer_ms = 0.0
 	_update_camera()
+	# Update level name label
+	if _hud_level_label:
+		_hud_level_label.text = "Level %d" % (GameManager.current_level_index + 1)
 	# Update best time label
 	if _hud_best_label:
 		var best_ms: Variant = GameManager.best_ms(GameManager.current_level_index)
@@ -117,12 +118,12 @@ class _TimerBackground extends Node2D:
 	var bg_center_x: float = 512.0  # overridden on mobile
 
 	func _draw() -> void:
-		var w := 320.0
-		var h := 150.0
+		var w := 240.0
+		var h := 160.0
 		var x := bg_center_x - w / 2.0
 		var y := 10.0
 		# Dark background
-		draw_rect(Rect2(x, y, w, h), Color(0, 0, 0, 0.4))
+		draw_rect(Rect2(x, y, w, h), Color(0, 0, 0, 0.25))
 		# White border
 		draw_rect(Rect2(x, y, w, h), Color.WHITE, false, 1.0)
 
