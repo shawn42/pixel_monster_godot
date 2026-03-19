@@ -4,6 +4,7 @@ var particle_color: Color = Color.WHITE
 var velocity: Vector2 = Vector2.ZERO
 var particle_size: int = 2
 var target: Node2D = null
+var pull_strength: float = 10.0
 var _alpha: float = 1.0
 
 func _process(delta: float) -> void:
@@ -12,7 +13,7 @@ func _process(delta: float) -> void:
 		var to_target := target.position - position
 		var dist      := to_target.length()
 		if dist > 1:
-			velocity += to_target.normalized() * delta * 10.0
+			velocity += to_target.normalized() * delta * pull_strength
 	else:
 		velocity.y -= delta * 5.0  # drift upward
 

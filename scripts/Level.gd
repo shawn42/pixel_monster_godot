@@ -2,6 +2,7 @@ extends Node2D
 class_name Level
 
 const TILE_SIZE := 32
+const TILE_HALF := TILE_SIZE / 2
 const ColorUtilsScript = preload("res://scripts/autoloads/ColorUtils.gd")
 
 ## Typed arrays — populated by LevelLoader, queried by Player each frame
@@ -44,7 +45,7 @@ func is_blocked(grid_pos: Vector2i) -> bool:
 func in_exit(world_pos: Vector2, size: Vector2) -> bool:
 	var ex := float(exit_grid_pos.x * TILE_SIZE + TILE_SIZE / 2)
 	var ey := float(exit_grid_pos.y * TILE_SIZE + TILE_SIZE / 2)
-	var exit_half := 14.0  # exit tile is 14x14 (inner box)
+	var exit_half := float(TILE_HALF)  # 16: half-extent of exit tile
 	return absf(world_pos.x - ex) <= (size.x + exit_half) and \
 	       absf(world_pos.y - ey) <= (size.y + exit_half)
 

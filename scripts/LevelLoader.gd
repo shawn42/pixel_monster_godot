@@ -185,91 +185,96 @@ static func load_level(png_path: String) -> Node2D:
 			var norm_px := _normalize_color(px)
 			var tile_type := pixel_to_tile_type(norm_px, parse.special_tiles)
 
-			match tile_type:
-				"player_spawn":
-					var p: Node2D = SCENE_PLAYER.instantiate()
-					p.position = Vector2(world_x, world_y)
-					level.add_child(p)
-					level.player = p
-
-				"exit":
-					var ex: Node2D = SCENE_EXIT.instantiate()
-					ex.position = Vector2(world_x, world_y)
-					if ex.get("exit_color") != null:
-						ex.set("exit_color", parse.exit_color)
-					level.add_child(ex)
-					level.exit_node = ex
-					level.exit_grid_pos = grid_pos
-
-				"color_source":
-					var tile: Node2D = SCENE_COLOR_SOURCE.instantiate()
-					tile.position = Vector2(world_x, world_y)
-					if tile.get("tile_color") != null:
-						tile.set("tile_color", px)
-					level.add_child(tile)
-					level.color_sources.append(tile)
-					colors.append(px)
-
-				"ghost":
-					var def: LevelLoader.TileDef = parse.special_tiles.get(norm_px)
-					var tile: Node2D = SCENE_GHOST.instantiate()
-					tile.position = Vector2(world_x, world_y)
-					if tile.get("tile_color") != null:
-						tile.set("tile_color", def.display_color if def else px)
-					level.add_child(tile)
-					level.color_sources.append(tile)
-
-				"super_src":
-					var def: LevelLoader.TileDef = parse.special_tiles.get(norm_px)
-					var tile: Node2D = SCENE_SUPER_SRC.instantiate()
-					tile.position = Vector2(world_x, world_y)
-					if tile.get("tile_color") != null:
-						tile.set("tile_color", def.display_color if def else px)
-					level.add_child(tile)
-					level.color_sources.append(tile)
-
-				"bouncy":
-					var tile: Node2D = SCENE_BOUNCY.instantiate()
-					tile.position = Vector2(world_x, world_y)
-					level.add_child(tile)
-					level.tile_map[grid_pos] = true
-					level.bouncy_tiles.append(tile)
-
-				"death":
-					var tile: Node2D = SCENE_DEATH.instantiate()
-					tile.position = Vector2(world_x, world_y)
-					level.add_child(tile)
-					level.death_tiles.append(tile)
-
-				"black_hole":
-					var def: LevelLoader.TileDef = parse.special_tiles.get(norm_px)
-					var tile: Node2D = SCENE_BLACK_HOLE.instantiate()
-					tile.position = Vector2(world_x, world_y)
-					if tile.get("subtract_color") != null:
-						tile.set("subtract_color", def.subtract_color if def else Color.WHITE)
-					level.add_child(tile)
-					level.black_holes.append(tile)
-
-				"rainbow":
-					var def: LevelLoader.TileDef = parse.special_tiles.get(norm_px)
-					var tile: Node2D = SCENE_RAINBOW.instantiate()
-					tile.position = Vector2(world_x, world_y)
-					if tile.get("colors") != null:
-						tile.set("colors", def.colors if def else [Color.WHITE])
-					level.add_child(tile)
-					level.color_sources.append(tile)
-
-				"empty":
-					var tile: Node2D = SCENE_EMPTY.instantiate()
-					tile.position = Vector2(world_x, world_y)
-					level.add_child(tile)
-
-			# Check for MovableTile path
-			if tile_type not in ["player_spawn", "exit", "death", "empty"]:
+			# Check for path before creating any static tile — if a path exists,
+			# create only the MovableTile (not both static + moving at same position).
+			var made_movable := false
+			if tile_type not in ["player_spawn", "exit", "empty"]:
 				var path_locs := find_path_locs(img, grid_pos, px)
 				if path_locs.size() > 1:
-					var ordered := PathWalkerScript.build_path(path_locs, grid_pos)
-					_make_movable(level, col, row, px, ordered, parse, tile_type)
+					var ordered: Array[Vector2i] = PathWalkerScript.build_path(path_locs, grid_pos)
+					_make_movable(level, col, row, px, ordered, parse, tile_type, colors)
+					made_movable = true
+
+			if not made_movable:
+				match tile_type:
+					"player_spawn":
+						var p: Node2D = SCENE_PLAYER.instantiate()
+						p.position = Vector2(world_x, world_y)
+						level.add_child(p)
+						level.player = p
+						p.set("level", level)
+
+					"exit":
+						var ex: Node2D = SCENE_EXIT.instantiate()
+						ex.position = Vector2(world_x, world_y)
+						if ex.get("exit_color") != null:
+							ex.set("exit_color", parse.exit_color)
+						level.add_child(ex)
+						level.exit_node = ex
+						level.exit_grid_pos = grid_pos
+
+					"color_source":
+						var tile: Node2D = SCENE_COLOR_SOURCE.instantiate()
+						tile.position = Vector2(world_x, world_y)
+						if tile.get("tile_color") != null:
+							tile.set("tile_color", px)
+						level.add_child(tile)
+						level.color_sources.append(tile)
+						colors.append(px)
+
+					"ghost":
+						var def: LevelLoader.TileDef = parse.special_tiles.get(norm_px)
+						var tile: Node2D = SCENE_GHOST.instantiate()
+						tile.position = Vector2(world_x, world_y)
+						if tile.get("tile_color") != null:
+							tile.set("tile_color", def.display_color if def else px)
+						level.add_child(tile)
+						level.color_sources.append(tile)
+
+					"super_src":
+						var def: LevelLoader.TileDef = parse.special_tiles.get(norm_px)
+						var tile: Node2D = SCENE_SUPER_SRC.instantiate()
+						tile.position = Vector2(world_x, world_y)
+						if tile.get("tile_color") != null:
+							tile.set("tile_color", def.display_color if def else px)
+						level.add_child(tile)
+						level.color_sources.append(tile)
+
+					"bouncy":
+						var tile: Node2D = SCENE_BOUNCY.instantiate()
+						tile.position = Vector2(world_x, world_y)
+						level.add_child(tile)
+						level.tile_map[grid_pos] = true
+						level.bouncy_tiles.append(tile)
+
+					"death":
+						var tile: Node2D = SCENE_DEATH.instantiate()
+						tile.position = Vector2(world_x, world_y)
+						level.add_child(tile)
+						level.death_tiles.append(tile)
+
+					"black_hole":
+						var def: LevelLoader.TileDef = parse.special_tiles.get(norm_px)
+						var tile: Node2D = SCENE_BLACK_HOLE.instantiate()
+						tile.position = Vector2(world_x, world_y)
+						if tile.get("subtract_color") != null:
+							tile.set("subtract_color", def.subtract_color if def else Color.WHITE)
+						level.add_child(tile)
+						level.black_holes.append(tile)
+
+					"rainbow":
+						var def: LevelLoader.TileDef = parse.special_tiles.get(norm_px)
+						var tile: Node2D = SCENE_RAINBOW.instantiate()
+						tile.position = Vector2(world_x, world_y)
+						if tile.get("colors") != null:
+							tile.set("colors", def.colors if def else [Color.WHITE])
+						level.add_child(tile)
+						level.color_sources.append(tile)
+
+					"empty":
+						var tile: Node2D = SCENE_EMPTY.instantiate()
+						tile.position = Vector2(world_x, world_y)
+						level.add_child(tile)
 
 	# Compute average color (from color source pixels only)
 	if colors.size() > 0:
@@ -286,7 +291,8 @@ static func _make_movable(
 	px: Color,
 	ordered_path: Array[Vector2i],
 	parse: ParseResult,
-	tile_type: String
+	tile_type: String,
+	colors: Array[Color]
 ) -> void:
 	var world_x := float(col * TILE_SIZE + TILE_HALF)
 	var world_y := float(row * TILE_SIZE + TILE_HALF)
@@ -301,11 +307,13 @@ static func _make_movable(
 	# Inherit color/type data from special tile def if applicable
 	var norm_px := _normalize_color(px)
 	var def: LevelLoader.TileDef = parse.special_tiles.get(norm_px)
+	# Set source_type for all recognized tile types
+	if tile.get("source_type") != null:
+		tile.set("source_type", tile_type)
+
 	if def:
 		match def.type:
 			"color_source", "ghost", "super_src", "rainbow":
-				if tile.get("source_type") != null:
-					tile.set("source_type", def.type)
 				if not def.display_color.is_equal_approx(Color()):
 					if tile.get("tile_color") != null:
 						tile.set("tile_color", def.display_color)
@@ -315,3 +323,16 @@ static func _make_movable(
 
 	level.add_child(tile)
 	level.moving_tiles.append(tile)
+
+	# Also register in the appropriate interaction array based on tile type
+	match tile_type:
+		"color_source", "ghost", "super_src", "rainbow":
+			level.color_sources.append(tile)
+			colors.append(px)
+		"death":
+			level.death_tiles.append(tile)
+		"bouncy":
+			level.bouncy_tiles.append(tile)
+			level.tile_map[Vector2i(col, row)] = true
+		"black_hole":
+			level.black_holes.append(tile)

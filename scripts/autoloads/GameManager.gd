@@ -11,7 +11,13 @@ func _ready() -> void:
 	_scores.load(SCORES_PATH)
 	_music_player = AudioStreamPlayer.new()
 	add_child(_music_player)
-	call_deferred("load_level", 0)
+	# Window setup — done in code since project.godot settings get stripped by the editor
+	var win := get_window()
+	win.mode = Window.MODE_MAXIMIZED
+	win.content_scale_mode = Window.CONTENT_SCALE_MODE_CANVAS_ITEMS
+	win.content_scale_aspect = Window.CONTENT_SCALE_ASPECT_KEEP
+	var start_level := 22 if OS.is_debug_build() else 0
+	call_deferred("load_level", start_level)
 
 func load_level(index: int) -> void:
 	current_level_index = index
@@ -34,6 +40,9 @@ func reload_level() -> void:
 
 func skip_level() -> void:
 	complete_level(INF)  # skip doesn't save a score
+
+func prev_level() -> void:
+	load_level((current_level_index - 1 + LEVEL_COUNT) % LEVEL_COUNT)
 
 func best_ms(level_index: int) -> Variant:
 	var key := "level%d" % (level_index + 1)

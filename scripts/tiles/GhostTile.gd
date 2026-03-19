@@ -9,4 +9,4 @@ func _ready() -> void:
 func _draw() -> void:
 	var c := tile_color
 	c.a = 0.5
-	draw_rect(Rect2(-7, -7, 14, 14), c)
+	draw_rect(Rect2(-14, -14, 28, 28), c)

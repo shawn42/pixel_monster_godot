@@ -1,4 +1,4 @@
-extends Area2D
+extends StaticBody2D
 
 var colors: Array[Color] = [Color.WHITE]
 var _color_index: int = 0
@@ -25,4 +25,4 @@ func _update_color() -> void:
 	set_meta("tile_color", colors[_color_index])
 
 func _draw() -> void:
-	draw_rect(Rect2(-8, -8, 16, 16), colors[_color_index])
+	draw_rect(Rect2(-16, -16, 32, 32), colors[_color_index])

@@ -11,8 +11,11 @@ func _on_particles_requested(
 	target: Node2D,
 	intensity: int,
 	speed_range: Vector2,
-	size_range: Vector2i
+	size_range: Vector2i,
+	y_speed_range: Vector2,
+	spawn_offset: Vector2
 ) -> void:
+	var yr := y_speed_range if y_speed_range != Vector2.ZERO else speed_range
 	var spawn_parent := get_tree().current_scene
 	if not spawn_parent:
 		return
@@ -28,7 +31,7 @@ func _on_particles_requested(
 		Color.BLUE:  roundi(intensity * color.b / total),
 	}
 
-	var spawn_pos: Vector2 = target.position if is_instance_valid(target) else Vector2.ZERO
+	var spawn_pos: Vector2 = (target.position if is_instance_valid(target) else Vector2.ZERO) + spawn_offset
 
 	for sub_color: Color in counts:
 		var count: int = counts[sub_color]
@@ -41,7 +44,7 @@ func _on_particles_requested(
 			p.particle_color = sub_color
 			p.velocity = Vector2(
 				randf_range(speed_range.x, speed_range.y),
-				randf_range(speed_range.x, speed_range.y)
+				randf_range(yr.x, yr.y)
 			)
 			p.particle_size = randi_range(size_range.x, size_range.y)
 			p.target = target if is_instance_valid(target) else null
