@@ -45,7 +45,7 @@ func _update_camera() -> void:
 		# Small level: stationary center at (512, 512)
 		_level.scale = Vector2.ONE
 		_level.position = Vector2(WINDOW_SIZE / 2.0 - lw / 2.0,
-		                          WINDOW_SIZE / 2.0 - lh / 2.0)
+								  WINDOW_SIZE / 2.0 - lh / 2.0)
 
 func _process(delta: float) -> void:
 	if not _level:
