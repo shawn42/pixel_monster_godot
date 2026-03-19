@@ -1,8 +1,8 @@
 extends Control
 
-const BUTTON_SIZE := 120.0
-const BUTTON_MARGIN := 30.0
-const BUTTON_Y_OFFSET := 160.0
+const BUTTON_SIZE := 240.0
+const BUTTON_MARGIN := 15.0
+const BUTTON_Y_OFFSET := 280.0
 const ARROW_COLOR := Color(1, 1, 1, 0.3)
 const PRESSED_COLOR := Color(1, 1, 1, 0.6)
 
@@ -16,12 +16,19 @@ func _ready() -> void:
 func _process(_delta: float) -> void:
 	queue_redraw()
 
+const LEFT_GUTTER  := 550.0
+const RIGHT_GUTTER := 400.0
+
 func _draw() -> void:
 	if not _parent:
 		return
 	var vs := get_viewport_rect().size
 	var left_pressed: bool = _parent._left_pressed if _parent else false
 	var right_pressed: bool = _parent._right_pressed if _parent else false
+
+	# Black gutter backgrounds
+	draw_rect(Rect2(0, 0, LEFT_GUTTER, vs.y), Color.BLACK)
+	draw_rect(Rect2(vs.x - RIGHT_GUTTER, 0, RIGHT_GUTTER, vs.y), Color.BLACK)
 
 	# Left button background
 	var lx := BUTTON_MARGIN
@@ -42,7 +49,7 @@ func _draw() -> void:
 	_draw_arrow(rc, 1, arrow_col)
 
 func _draw_arrow(center: Vector2, direction: int, color: Color) -> void:
-	var size := 30.0
+	var size := 70.0
 	var half := size / 2.0
 	# Triangle pointing left (-1) or right (+1)
 	var tip := center + Vector2(direction * half, 0)

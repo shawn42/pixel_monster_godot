@@ -1,8 +1,11 @@
 extends Node2D
 
 const WINDOW_SIZE := 1024.0
+const MOBILE_LEFT_GUTTER  := 550.0  # left gutter for touch buttons
+const MOBILE_RIGHT_GUTTER := 400.0  # right gutter for color inspector
 
 var _level: Node2D = null
+var _is_mobile := false
 var _timer_ms: float = 0.0
 var _hud_timer_label: Label = null
 var _hud_best_label:  Label = null
@@ -12,10 +15,20 @@ func _ready() -> void:
 	GameEvents.level_complete.connect(_on_level_complete)
 	GameEvents.player_died.connect(_on_player_died)
 	GameEvents.sound_requested.connect(_on_sound_requested)
+	_is_mobile = DisplayServer.is_touchscreen_available()
 
 	_hud_timer_label = $HUD/TimerLabel
 	_hud_best_label  = $HUD/BestTimeLabel
 	_color_bars      = $HUD/ColorBars
+	# On mobile, reparent color bars to TouchControls (layer 10) so it draws
+	# above the black gutter background, and position in the right gutter
+	if _is_mobile:
+		var touch := get_node_or_null("/root/Game/TouchControls")
+		if touch:
+			_color_bars.reparent(touch)
+		var right_gutter_center := MOBILE_LEFT_GUTTER + WINDOW_SIZE + MOBILE_RIGHT_GUTTER / 2.0
+		_color_bars.position = Vector2(right_gutter_center, WINDOW_SIZE / 2.0 + 60.0)
+		_color_bars.scale = Vector2(3.0, 3.0)
 
 func load_level(level: Node2D) -> void:
 	if _level:
@@ -32,6 +45,7 @@ func load_level(level: Node2D) -> void:
 func _update_camera() -> void:
 	if not _level:
 		return
+	var gutter := MOBILE_LEFT_GUTTER if _is_mobile else 0.0
 	var lw := float(_level.map_width  * 32)
 	var lh := float(_level.map_height * 32)
 	var scale_x := WINDOW_SIZE / lw
@@ -40,11 +54,11 @@ func _update_camera() -> void:
 		# Autofit: scale to fit
 		var s := minf(scale_x, scale_y)
 		_level.scale = Vector2(s, s)
-		_level.position = Vector2.ZERO
+		_level.position = Vector2(gutter, 0.0)
 	else:
-		# Small level: stationary center at (512, 512)
+		# Small level: center in game area (right of gutter)
 		_level.scale = Vector2.ONE
-		_level.position = Vector2(WINDOW_SIZE / 2.0 - lw / 2.0,
+		_level.position = Vector2(gutter + WINDOW_SIZE / 2.0 - lw / 2.0,
 								  WINDOW_SIZE / 2.0 - lh / 2.0)
 
 func _process(delta: float) -> void:

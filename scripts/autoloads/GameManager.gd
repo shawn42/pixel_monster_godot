@@ -16,6 +16,9 @@ func _ready() -> void:
 	win.mode = Window.MODE_MAXIMIZED
 	win.content_scale_mode = Window.CONTENT_SCALE_MODE_CANVAS_ITEMS
 	win.content_scale_aspect = Window.CONTENT_SCALE_ASPECT_KEEP
+	# On mobile, widen viewport to add a left gutter for touch buttons
+	if DisplayServer.is_touchscreen_available():
+		win.content_scale_size = Vector2i(1974, 1024)  # 550 left gutter + 1024 game + 400 right gutter
 	var start_level := 0 if OS.is_debug_build() else 0
 	call_deferred("load_level", start_level)
 

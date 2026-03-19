@@ -4,9 +4,9 @@ var _left_pressed := false
 var _right_pressed := false
 var _jump_touch_id := -1
 
-const BUTTON_SIZE := 120.0
-const BUTTON_MARGIN := 30.0
-const BUTTON_Y_OFFSET := 160.0  # distance from bottom
+const BUTTON_SIZE := 240.0
+const BUTTON_MARGIN := 15.0
+const BUTTON_Y_OFFSET := 280.0  # distance from bottom
 
 func _ready() -> void:
 	# Only show on touchscreen devices
