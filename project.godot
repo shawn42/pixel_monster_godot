@@ -18,6 +18,7 @@ config/name="PixelMonster"
 run/main_scene="res://scenes/Game.tscn"
 config/features=PackedStringArray("4.6", "GL Compatibility")
 config/icon="res://icon.png"
+boot_splash/show_image=false
 
 [autoload]
 

@@ -11,7 +11,7 @@ const FULL_H  := 60.0
 func _draw() -> void:
 	# Background box
 	draw_rect(Rect2(-5, -FULL_H - 10, 70, FULL_H + 10),
-	          Color(1, 1, 1, 0.16))
+	          Color(1, 1, 1, 0.35))
 
 	_draw_channel(0,  exit_color.r, player_color.r, Color.RED)
 	_draw_channel(20, exit_color.g, player_color.g, Color.GREEN)

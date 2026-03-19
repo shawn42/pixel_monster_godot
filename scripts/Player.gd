@@ -46,6 +46,7 @@ func _ready() -> void:
 	# Mask 5 = layer 1 (walls) + layer 3/bitmask4 (moving tiles) — player can stand on both.
 	collision_layer = 2
 	collision_mask  = 5
+	z_index = 20
 
 func _physics_process(delta: float) -> void:
 	_time += delta

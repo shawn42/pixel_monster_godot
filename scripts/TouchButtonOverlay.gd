@@ -20,7 +20,7 @@ func _process(_delta: float) -> void:
 	queue_redraw()
 
 const LEFT_GUTTER  := 550.0
-const RIGHT_GUTTER := 400.0
+const RIGHT_GUTTER := 550.0
 
 func _draw() -> void:
 	if not _parent:
@@ -31,7 +31,18 @@ func _draw() -> void:
 
 	# Black gutter backgrounds
 	draw_rect(Rect2(0, 0, LEFT_GUTTER, vs.y), Color.BLACK)
-	draw_rect(Rect2(vs.x - RIGHT_GUTTER, 0, RIGHT_GUTTER, vs.y), Color.BLACK)
+	var jump_pressed: bool = _parent._jump_touch_id >= 0 if _parent else false
+	# Right gutter: all black background
+	var rg_x := vs.x - RIGHT_GUTTER
+	draw_rect(Rect2(rg_x, 0, RIGHT_GUTTER, vs.y), Color.BLACK)
+
+	# Jump button: double-wide, matching L/R style
+	var jump_w := BUTTON_SIZE * 2.0 + BUTTON_MARGIN
+	var jx := rg_x + (RIGHT_GUTTER - jump_w) / 2.0
+	var jy := vs.y - BUTTON_Y_OFFSET
+	draw_rect(Rect2(jx, jy, jump_w, BUTTON_SIZE), PRESSED_COLOR if jump_pressed else Color(1, 1, 1, 0.1))
+	var jc := Vector2(jx + jump_w / 2.0, jy + BUTTON_SIZE / 2.0)
+	_draw_jump_icon(jc, PRESSED_COLOR if jump_pressed else ARROW_COLOR)
 
 	# Restart button (top-left)
 	var rst_x := BUTTON_MARGIN
@@ -121,3 +132,12 @@ func _draw_exit_icon(center: Vector2, color: Color) -> void:
 	var w := 4.0
 	draw_line(center + Vector2(-s, -s), center + Vector2(s, s), color, w)
 	draw_line(center + Vector2(s, -s), center + Vector2(-s, s), color, w)
+
+func _draw_jump_icon(center: Vector2, color: Color) -> void:
+	# Upward arrow — same size/style as _draw_arrow but pointing up
+	var size := 70.0
+	var half := size / 2.0
+	var tip := center + Vector2(0, -half)
+	var bot_l := center + Vector2(-half, half)
+	var bot_r := center + Vector2(half, half)
+	draw_colored_polygon(PackedVector2Array([tip, bot_l, bot_r]), color)

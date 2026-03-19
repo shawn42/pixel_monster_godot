@@ -2,7 +2,7 @@ extends Node2D
 
 const WINDOW_SIZE := 1024.0
 const MOBILE_LEFT_GUTTER  := 550.0  # left gutter for touch buttons
-const MOBILE_RIGHT_GUTTER := 400.0  # right gutter for color inspector
+const MOBILE_RIGHT_GUTTER := 550.0  # right gutter for jump button + color inspector
 
 var _level: Node2D = null
 var _is_mobile := false
@@ -10,6 +10,7 @@ var _timer_ms: float = 0.0
 var _hud_timer_label: Label = null
 var _hud_best_label:  Label = null
 var _color_bars:      Node2D = null
+var _timer_bg:        Node2D = null
 
 func _ready() -> void:
 	GameEvents.level_complete.connect(_on_level_complete)
@@ -20,6 +21,10 @@ func _ready() -> void:
 	_hud_timer_label = $HUD/TimerLabel
 	_hud_best_label  = $HUD/BestTimeLabel
 	_color_bars      = $HUD/ColorBars
+	# Add darkened background behind timer labels
+	_timer_bg = _TimerBackground.new()
+	$HUD.add_child(_timer_bg)
+	$HUD.move_child(_timer_bg, 0)  # behind the labels
 	# On mobile, reparent color bars to TouchControls (layer 10) so it draws
 	# above the black gutter background, and position in the right gutter
 	if _is_mobile:
@@ -27,10 +32,12 @@ func _ready() -> void:
 		if touch:
 			_color_bars.reparent(touch)
 		var right_gutter_center := MOBILE_LEFT_GUTTER + WINDOW_SIZE + MOBILE_RIGHT_GUTTER / 2.0
-		_color_bars.position = Vector2(right_gutter_center, WINDOW_SIZE / 2.0 + 60.0)
+		_color_bars.position = Vector2(right_gutter_center, WINDOW_SIZE / 4.0)
 		_color_bars.scale = Vector2(3.0, 3.0)
-		# Center timer labels over the game area, not the full viewport
+		# Center timer labels and background over the game area
 		var game_center_x := MOBILE_LEFT_GUTTER + WINDOW_SIZE / 2.0
+		if _timer_bg:
+			_timer_bg.bg_center_x = game_center_x
 		if _hud_timer_label:
 			_hud_timer_label.anchor_left = 0.0
 			_hud_timer_label.anchor_right = 0.0
@@ -104,3 +111,20 @@ func _on_sound_requested(path: String) -> void:
 	player.autoplay = true
 	add_child(player)
 	player.finished.connect(player.queue_free)
+
+## Draws the darkened background + white border behind the timer/best labels.
+class _TimerBackground extends Node2D:
+	var bg_center_x: float = 512.0  # overridden on mobile
+
+	func _draw() -> void:
+		var w := 320.0
+		var h := 150.0
+		var x := bg_center_x - w / 2.0
+		var y := 10.0
+		# Dark background
+		draw_rect(Rect2(x, y, w, h), Color(0, 0, 0, 0.4))
+		# White border
+		draw_rect(Rect2(x, y, w, h), Color.WHITE, false, 1.0)
+
+	func _process(_delta: float) -> void:
+		queue_redraw()
