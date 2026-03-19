@@ -125,8 +125,8 @@ static func find_path_locs(img: Image, start_loc: Vector2i, tile_color: Color) -
 
 static func _color_close_enough(a: Color, b: Color) -> bool:
 	return absf(a.r - b.r) < PATH_RGB_TOLERANCE and \
-	       absf(a.g - b.g) < PATH_RGB_TOLERANCE and \
-	       absf(a.b - b.b) < PATH_RGB_TOLERANCE
+		   absf(a.g - b.g) < PATH_RGB_TOLERANCE and \
+		   absf(a.b - b.b) < PATH_RGB_TOLERANCE
 
 static func _colors_approx_equal(a: Color, b: Color) -> bool:
 	# Exact match with a small float tolerance
@@ -163,7 +163,8 @@ const ColorUtilsScript    := preload("res://scripts/autoloads/ColorUtils.gd")
 ## Load a level from PNG file path (e.g. "res://levels/level1.png").
 ## Returns a Level node ready to be added to the scene tree.
 static func load_level(png_path: String) -> Node2D:
-	var img := Image.load_from_file(png_path)
+	var tex := load(png_path) as Texture2D
+	var img := tex.get_image()
 	var parse := parse_commands(img)
 
 	var level: Node2D = SCENE_LEVEL.instantiate()

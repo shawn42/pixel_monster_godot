@@ -16,7 +16,7 @@ func _ready() -> void:
 	win.mode = Window.MODE_MAXIMIZED
 	win.content_scale_mode = Window.CONTENT_SCALE_MODE_CANVAS_ITEMS
 	win.content_scale_aspect = Window.CONTENT_SCALE_ASPECT_KEEP
-	var start_level := 22 if OS.is_debug_build() else 0
+	var start_level := 0 if OS.is_debug_build() else 0
 	call_deferred("load_level", start_level)
 
 func load_level(index: int) -> void:
@@ -46,8 +46,9 @@ func prev_level() -> void:
 
 func best_ms(level_index: int) -> Variant:
 	var key := "level%d" % (level_index + 1)
-	var val: Variant = _scores.get_value("scores", key, null)
-	return val
+	if not _scores.has_section_key("scores", key):
+		return null
+	return _scores.get_value("scores", key)
 
 ## Music selection: map level hue (0.0–1.0) to one of available music files.
 func _play_music_for_level(level: Node2D) -> void:
@@ -65,14 +66,19 @@ func _play_music_for_level(level: Node2D) -> void:
 	_music_player.play()
 
 func _get_music_files() -> Array[String]:
-	var files: Array[String] = []
-	var dir := DirAccess.open("res://music/")
-	if dir:
-		dir.list_dir_begin()
-		var fname := dir.get_next()
-		while fname != "":
-			if fname.ends_with(".mp3") or fname.ends_with(".ogg"):
-				files.append("res://music/" + fname)
-			fname = dir.get_next()
-	files.sort()
-	return files
+	# Hardcoded list — DirAccess can't enumerate packed resources in exports
+	return [
+		"res://music/Ozzed---8-bit-Run-n-Pun---01-Introjiuce.mp3",
+		"res://music/Ozzed---8-bit-Run-n-Pun---02-Failien-Funk.mp3",
+		"res://music/Ozzed---8-bit-Run-n-Pun---03-Stroll-n-Roll.mp3",
+		"res://music/Ozzed---8-bit-Run-n-Pun---04-Shell-Shock-Shake.mp3",
+		"res://music/Ozzed---8-bit-Run-n-Pun---05-Im-a-Fighter.mp3",
+		"res://music/Ozzed---8-bit-Run-n-Pun---06-Going-Down-Tune.mp3",
+		"res://music/Ozzed---8-bit-Run-n-Pun---07-Cloud-Crash.mp3",
+		"res://music/Ozzed---8-bit-Run-n-Pun---08-Filaments-and-Voids.mp3",
+		"res://music/Ozzed---8-bit-Run-n-Pun---09-Bonus-Rage.mp3",
+		"res://music/Ozzed---8-bit-Run-n-Pun---10-Its-not-My-Ship.mp3",
+		"res://music/Ozzed---8-bit-Run-n-Pun---11-Perihelium.mp3",
+		"res://music/Ozzed---8-bit-Run-n-Pun---12-Shingle-Tingle.mp3",
+		"res://music/Ozzed---8-bit-Run-n-Pun---13-Just-a-Minuet.mp3",
+	]
