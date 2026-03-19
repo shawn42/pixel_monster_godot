@@ -49,4 +49,5 @@ func _on_particles_requested(
 			p.particle_size = randi_range(size_range.x, size_range.y)
 			p.target = target if is_instance_valid(target) else null
 			p.z_index = 30
+			p.add_to_group("particles")
 			spawn_parent.add_child(p)

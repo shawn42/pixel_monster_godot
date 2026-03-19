@@ -19,15 +19,15 @@ func _ready() -> void:
 	# On mobile, widen viewport to add a left gutter for touch buttons
 	if DisplayServer.is_touchscreen_available():
 		win.content_scale_size = Vector2i(2124, 1024)  # 550 left gutter + 1024 game + 550 right gutter
-	var start_level := 0 if OS.is_debug_build() else 0
-	call_deferred("load_level", start_level)
 
 func load_level(index: int) -> void:
 	current_level_index = index
 	var path := "res://levels/level%d.png" % (index + 1)
 	var level := LevelLoader.load_level(path)
 	_play_music_for_level(level)
-	get_node("/root/Game").load_level(level)
+	var game := get_node_or_null("/root/Game")
+	if game:
+		game.load_level(level)
 
 func complete_level(elapsed_ms: float) -> void:
 	var key := "level%d" % (current_level_index + 1)

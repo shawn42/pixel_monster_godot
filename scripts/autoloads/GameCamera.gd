@@ -48,7 +48,13 @@ func _ready() -> void:
 				lbl.offset_left = game_center_x - 150.0
 				lbl.offset_right = game_center_x + 150.0
 
+	# Load first level when Game scene starts
+	GameManager.call_deferred("load_level", 0)
+
 func load_level(level: Node2D) -> void:
+	# Clear any lingering particles from previous level/death
+	for p in get_tree().get_nodes_in_group("particles"):
+		p.queue_free()
 	if _level:
 		_level.queue_free()
 	_level = level
