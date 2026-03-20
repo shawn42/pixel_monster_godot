@@ -42,7 +42,7 @@ func _handle_touch(event: InputEventScreenTouch) -> void:
 			GameManager.reload_level()
 		elif _is_in_skip_button(pos):
 			GameManager.skip_level()
-		elif _is_in_exit_button(pos):
+		elif _is_in_exit_button(pos) and OS.get_name() != "iOS":
 			get_tree().quit()
 		elif _is_in_left_target(pos, viewport_size):
 			_left_pressed = true

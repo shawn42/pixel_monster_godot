@@ -32,22 +32,41 @@ levels:
 loc:
     @find scripts -name '*.gd' | xargs wc -l | tail -1
 
-# Export iOS Xcode project
+# Export iOS Xcode project (may fail on signing but generates the project)
 export-ios:
     mkdir -p ios
-    godot --path . --headless --export-debug "iOS" ios/PixelMonster.ipa
+    godot --path . --headless --export-debug "iOS" ios/PixelMonster.ipa || true
+    @test -d ios/PixelMonster.xcodeproj && echo "Xcode project generated" || (echo "Export failed" && exit 1)
+    sed -i '' 's/CODE_SIGN_IDENTITY = "Apple Distribution"/CODE_SIGN_IDENTITY = "Apple Development"/g' ios/PixelMonster.xcodeproj/project.pbxproj
 
-# Run in iOS Simulator (default: iPhone 17 Pro)
-# Requires App Store Team ID in export_presets.cfg
-sim-ios device="iPhone 17 Pro": export-ios
-    xcrun simctl boot "{{device}}" 2>/dev/null || true
-    open -a Simulator
-    xcrun simctl install "{{device}}" ios/PixelMonster.ipa
-    xcrun simctl launch "{{device}}" com.shawn42.pixelmonster
-
-# Build and run on connected iOS device (requires ios-deploy: brew install ios-deploy)
+# Build and install on connected iOS device (requires: brew install ios-deploy)
 deploy-ios: export-ios
-    ios-deploy --bundle ios/PixelMonster.ipa --debug
+    rm -rf ios/build
+    xcodebuild -project ios/PixelMonster.xcodeproj \
+        -scheme PixelMonster \
+        -sdk iphoneos \
+        -configuration Debug \
+        DEVELOPMENT_TEAM=4Q9YT4FMZL \
+        OTHER_LDFLAGS='$$(inherited) -lswift_Concurrency' \
+        -allowProvisioningUpdates \
+        -derivedDataPath ios/build
+    ios-deploy --bundle $(find ios/build -name "PixelMonster.app" -path "*/Debug-iphoneos/*" | head -1) --no-wifi
+
+# Export macOS app (.dmg)
+export-mac:
+    godot --path . --headless --export-debug "macOS" PixelMonster.dmg
+
+# Run macOS app
+run-mac: export-mac
+    open PixelMonster.dmg
+
+# Export Windows exe (cross-compiled)
+export-windows:
+    godot --path . --headless --export-debug "Windows" PixelMonster.exe
+
+# Export Linux binary (cross-compiled)
+export-linux:
+    godot --path . --headless --export-debug "Linux" PixelMonster.x86_64
 
 # Export Web build
 export-web:
@@ -62,6 +81,7 @@ serve: export-web
 # Clean build artifacts
 clean:
     rm -f pixel-monster.apk pixel-monster.apk.idsig
+    rm -f PixelMonster.dmg PixelMonster.exe PixelMonster.x86_64
     rm -rf web/ ios/
 
 # Validate scenes can be parsed (headless import)

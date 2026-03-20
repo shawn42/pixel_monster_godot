@@ -56,11 +56,12 @@ func _draw() -> void:
 	draw_rect(Rect2(skip_x, skip_y, TOP_BTN_SIZE, TOP_BTN_SIZE), Color(1, 1, 1, 0.1))
 	_draw_skip_icon(Vector2(skip_x + TOP_BTN_SIZE / 2, skip_y + TOP_BTN_SIZE / 2), LABEL_COLOR)
 
-	# Exit button (top, next to skip)
-	var exit_x := BUTTON_MARGIN + (TOP_BTN_SIZE + BUTTON_MARGIN) * 2
-	var exit_y := TOP_BTN_Y
-	draw_rect(Rect2(exit_x, exit_y, TOP_BTN_SIZE, TOP_BTN_SIZE), Color(1, 1, 1, 0.1))
-	_draw_exit_icon(Vector2(exit_x + TOP_BTN_SIZE / 2, exit_y + TOP_BTN_SIZE / 2), LABEL_COLOR)
+	# Exit button (top, next to skip) — hidden on iOS per Apple guidelines
+	if OS.get_name() != "iOS":
+		var exit_x := BUTTON_MARGIN + (TOP_BTN_SIZE + BUTTON_MARGIN) * 2
+		var exit_y := TOP_BTN_Y
+		draw_rect(Rect2(exit_x, exit_y, TOP_BTN_SIZE, TOP_BTN_SIZE), Color(1, 1, 1, 0.1))
+		_draw_exit_icon(Vector2(exit_x + TOP_BTN_SIZE / 2, exit_y + TOP_BTN_SIZE / 2), LABEL_COLOR)
 
 	# Left button background
 	var lx := BUTTON_MARGIN

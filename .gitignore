@@ -1,2 +1,13 @@
 .godot/
 addons/
+
+# Build artifacts
+pixel-monster.apk
+pixel-monster.apk.idsig
+PixelMonster.dmg
+PixelMonster.exe
+PixelMonster.x86_64
+PixelMonster.console.exe
+*.dll
+web/
+ios/
