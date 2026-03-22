@@ -31,7 +31,7 @@ func _ready() -> void:
 	# Player mask includes layer 3, so player can still stand on moving tiles.
 	# Crush detection is manual via _boxes_touch.
 	collision_layer = 4
-	collision_mask  = 1
+	collision_mask  = 0  # no collision response — paths are predefined, crush is manual
 
 func _physics_process(delta: float) -> void:
 	if path_nodes.is_empty():
@@ -76,8 +76,10 @@ func _physics_process(delta: float) -> void:
 		_velocity = Vector2.ZERO
 		set_meta("velocity", _velocity)
 
-	# Move tile directly along path (no physics — paths are predefined)
-	position += _velocity * delta
+	# Use velocity + move_and_slide so Godot's physics engine registers this
+	# as a moving platform (required for Player.is_on_floor() on iOS)
+	velocity = _velocity
+	move_and_slide()
 
 	# Crush detection handled by Player._check_crush() after move_and_slide()
 
