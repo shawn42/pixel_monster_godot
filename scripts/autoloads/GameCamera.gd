@@ -64,7 +64,7 @@ func load_level(level: Node2D) -> void:
 	_update_camera()
 	# Update level name label
 	if _hud_level_label:
-		_hud_level_label.text = "Level %d" % (GameManager.current_level_index + 1)
+		_hud_level_label.text = "%d: %s" % [GameManager.current_level_index + 1, GameManager.level_name(GameManager.current_level_index)]
 	# Update best time label
 	if _hud_best_label:
 		var best_ms: Variant = GameManager.best_ms(GameManager.current_level_index)
@@ -107,6 +107,11 @@ func _process(delta: float) -> void:
 		_color_bars.queue_redraw()
 	if Input.is_action_just_pressed("quit"):
 		get_tree().quit()
+	# Skip/prev must work even during death delay (player physics is paused)
+	if Input.is_action_just_pressed("skip_level") and not Input.is_key_pressed(KEY_SHIFT):
+		GameManager.skip_level()
+	if Input.is_action_just_pressed("prev_level"):
+		GameManager.prev_level()
 
 func _update_hud() -> void:
 	if _hud_timer_label:

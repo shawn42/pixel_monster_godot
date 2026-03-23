@@ -7,7 +7,7 @@ const PLAYER_HALF := TILE_HALF - 2   # 14 — player slightly smaller than tile
 
 const GRAVITY        := 45.0          # 0.75 px/frame × 60fps → px/s per frame
 const MAX_VEL        := 900.0         # 15 px/frame × 60fps
-const JUMP_FORCE     := -930.0
+const JUMP_FORCE     := -915.0
 const SUPER_JUMP     := -1550.0
 const JUMP_FORGIVE   := 0.100         # 100ms
 const RUN_FORGIVE    := 0.020         # 20ms
@@ -142,11 +142,7 @@ func _physics_process(delta: float) -> void:
 	if level:
 		_check_tile_interactions()
 
-	# --- Level actions ---
-	if Input.is_action_just_pressed("skip_level") and not Input.is_key_pressed(KEY_SHIFT):
-		GameEvents.level_complete.emit()  # skip = immediate next level
-	if Input.is_action_just_pressed("prev_level"):
-		GameManager.prev_level()
+	# --- Level actions (skip/prev handled by GameCamera so they work during death delay) ---
 	if Input.is_action_just_pressed("reset"):
 		_die()
 

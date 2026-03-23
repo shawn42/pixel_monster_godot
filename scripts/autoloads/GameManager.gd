@@ -1,13 +1,15 @@
 extends Node
 
-const LEVEL_COUNT := 36
+const LEVELS_PATH := "res://levels/levels.json"
 const SCORES_PATH := "user://scores.cfg"
 
 var current_level_index: int = 0
+var levels: Array = []
 var _scores := ConfigFile.new()
 var _music_player: AudioStreamPlayer = null
 
 func _ready() -> void:
+	_load_levels_config()
 	_scores.load(SCORES_PATH)
 	_music_player = AudioStreamPlayer.new()
 	add_child(_music_player)
@@ -20,9 +22,19 @@ func _ready() -> void:
 	if DisplayServer.is_touchscreen_available():
 		win.content_scale_size = Vector2i(2124, 1024)  # 550 left gutter + 1024 game + 550 right gutter
 
+func level_count() -> int:
+	return levels.size()
+
+func level_name(index: int) -> String:
+	if index >= 0 and index < levels.size():
+		return levels[index].get("name", "Level %d" % (index + 1))
+	return "Level %d" % (index + 1)
+
 func load_level(index: int) -> void:
 	current_level_index = index
-	var path := "res://levels/level%d.png" % (index + 1)
+	var entry: Dictionary = levels[index] if index < levels.size() else {}
+	var file: String = entry.get("file", "level%d.png" % (index + 1))
+	var path := "res://levels/" + file
 	var level := LevelLoader.load_level(path)
 	_play_music_for_level(level)
 	var game := get_node_or_null("/root/Game")
@@ -35,7 +47,7 @@ func complete_level(elapsed_ms: float) -> void:
 	if elapsed_ms < best:
 		_scores.set_value("scores", key, elapsed_ms)
 		_scores.save(SCORES_PATH)
-	var next := (current_level_index + 1) % LEVEL_COUNT
+	var next := (current_level_index + 1) % level_count()
 	load_level(next)
 
 func reload_level() -> void:
@@ -45,7 +57,7 @@ func skip_level() -> void:
 	complete_level(INF)  # skip doesn't save a score
 
 func prev_level() -> void:
-	load_level((current_level_index - 1 + LEVEL_COUNT) % LEVEL_COUNT)
+	load_level((current_level_index - 1 + level_count()) % level_count())
 
 func best_ms(level_index: int) -> Variant:
 	var key := "level%d" % (level_index + 1)
@@ -67,6 +79,20 @@ func _play_music_for_level(level: Node2D) -> void:
 	_music_player.stream = load(path)
 	_music_player.volume_db = linear_to_db(0.1)
 	_music_player.play()
+
+func _load_levels_config() -> void:
+	var file := FileAccess.open(LEVELS_PATH, FileAccess.READ)
+	if not file:
+		push_warning("Could not load levels.json, falling back to numbered levels")
+		for i in range(36):
+			levels.append({"file": "level%d.png" % (i + 1), "name": "Level %d" % (i + 1)})
+		return
+	var json := JSON.new()
+	var err := json.parse(file.get_as_text())
+	if err != OK:
+		push_warning("Failed to parse levels.json: %s" % json.get_error_message())
+		return
+	levels = json.data
 
 func _get_music_files() -> Array[String]:
 	# Hardcoded list — DirAccess can't enumerate packed resources in exports
